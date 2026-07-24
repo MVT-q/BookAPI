@@ -19,8 +19,11 @@ namespace BookApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Book>>> GetAll()
         {
+            var userName = User.Identity?.Name;
+
             return Ok(await _service.GetAllAsync());
         }
 
