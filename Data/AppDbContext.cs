@@ -9,5 +9,7 @@ namespace BookApi.Data
             : base(options) { }
 
         public DbSet<Book> Books { get; set; } = null!;
+        
+        public DbSet<User> Users { get; set; } = null!;
     }
 }

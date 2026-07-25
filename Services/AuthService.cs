@@ -1,4 +1,8 @@
-﻿using BookApi.DTOs;
+﻿using BookApi.Data;
+using BookApi.DTOs;
+using BookApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,21 +14,38 @@ namespace BookApi.Services
     {
         private readonly IConfiguration _configuration;
 
-        public AuthService(IConfiguration configuration)
+        private readonly AppDbContext _context;
+
+        private readonly PasswordHasher<User> _passwordHasher;
+
+        public AuthService(IConfiguration configuration, AppDbContext context)
         {
             _configuration = configuration;
+            _context = context;
+            _passwordHasher = new PasswordHasher<User>();
         }
 
-        public LoginResponseDto? Login(LoginDto request)
+        public async Task<LoginResponseDto?> LoginAsync(LoginDto request)
         {
-            if (request.Username != "admin" || request.Password != "123456")
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+
+            if (user == null) 
+                return null;
+
+            var result = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                request.Password);
+
+            if(result == PasswordVerificationResult.Failed)
             {
                 return null;
             }
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, request.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(
@@ -49,6 +70,27 @@ namespace BookApi.Services
             {
                 Token = tokenString,
             };
+        }
+
+        public async Task RegisterAsync(RegisterDto request)
+        {
+            bool exists = await _context.Users.AnyAsync(u => u.Username == request.Username);
+
+            if (exists)
+                throw new Exception("Username already exists");
+
+            var user = new User
+            {
+                Username = request.Username,
+                Email = request.Email,
+                Role = UserRole.User
+            };
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+
+            _context.Users.Add(user);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

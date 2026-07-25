@@ -2,7 +2,7 @@
 using BookApi.Models;
 using BookApi.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookApi.Controllers
@@ -23,6 +23,8 @@ namespace BookApi.Controllers
         public async Task<ActionResult<IEnumerable<Book>>> GetAll()
         {
             var userName = User.Identity?.Name;
+
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             return Ok(await _service.GetAllAsync());
         }

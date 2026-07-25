@@ -16,14 +16,22 @@ namespace BookApi.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<LoginResponseDto?> Login(LoginDto request)
+        public async Task<ActionResult<LoginResponseDto?>> Login(LoginDto request)
         {
-            var result = _authService.Login(request);
+            var result = await _authService.LoginAsync(request);
 
             if (result == null)
                 return Unauthorized();
 
             return Ok(result);
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterDto request)
+        {
+            await _authService.RegisterAsync(request);
+
+            return Ok();
         }
     }
 }
