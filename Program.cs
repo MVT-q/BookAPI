@@ -1,4 +1,5 @@
 using BookApi.Data;
+using BookApi.Middleware;
 using BookApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -82,6 +83,8 @@ namespace BookApi
             }
 
             app.UseHttpsRedirection();
+
+            app.UseExceptionHandlingMiddleware();
 
             app.UseAuthentication();
 

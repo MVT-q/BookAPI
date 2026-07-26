@@ -1,5 +1,6 @@
 ﻿using BookApi.Data;
 using BookApi.DTOs;
+using BookApi.Exceptions;
 using BookApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,7 @@ namespace BookApi.Services
             bool exists = await _context.Users.AnyAsync(u => u.Username == request.Username);
 
             if (exists)
-                throw new Exception("Username already exists");
+                throw new UserAlreadyExistsException("Username already exists");
 
             var user = new User
             {
