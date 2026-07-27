@@ -14,7 +14,7 @@ namespace BookApi.Services
             _context = context;
         }
 
-        public async Task<List<Book>> GetAllAsync()
+        public async Task<List<Book>> GetBooksAsync()
         {
             return await _context.Books.ToListAsync();
         }

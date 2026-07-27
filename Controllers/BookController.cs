@@ -11,28 +11,23 @@ namespace BookApi.Controllers
     [Route("api/[controller]")]
     public class BookController : ControllerBase
     {
-        private readonly BookService _service;
+        private readonly BookService _bookService;
 
-        public BookController(BookService service)
+        public BookController(BookService bookService)
         {
-            _service = service;
+            _bookService = bookService;
         }
 
         [HttpGet]
-        [Authorize]
-        public async Task<ActionResult<IEnumerable<Book>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            var userName = User.Identity?.Name;
-
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
-
-            return Ok(await _service.GetAllAsync());
+            return Ok(await _bookService.GetBooksAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetById(int id)
         {
-            var book = await _service.GetByIdAsync(id);
+            var book = await _bookService.GetByIdAsync(id);
 
             if(book == null)
                 return NotFound();
@@ -43,7 +38,7 @@ namespace BookApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> Create(CreateBookDto dto)
         {
-            var book = await _service.AddAsync(dto);
+            var book = await _bookService.AddAsync(dto);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -54,7 +49,7 @@ namespace BookApi.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Book>> Update(int id, UpdateBookDto dto)
         {
-            var book = await _service.UpdateAsync(id, dto);
+            var book = await _bookService.UpdateAsync(id, dto);
 
             if(book == null)
                 return NotFound();
@@ -65,7 +60,7 @@ namespace BookApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _service.DeleteAsync(id);
+            var deleted = await _bookService.DeleteAsync(id);
 
             if (!deleted)
                 return NotFound();

@@ -48,6 +48,8 @@ namespace BookApi
 
             builder.Services.AddScoped<BookService>();
 
+            builder.Services.AddScoped<UserService>();
+
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
