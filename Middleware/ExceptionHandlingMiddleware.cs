@@ -23,6 +23,10 @@ namespace BookApi.Middleware
                 {
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
                 }
+                else if(ex is CannotDeleteYourselfException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
                 else
                 {
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;

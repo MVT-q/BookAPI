@@ -1,6 +1,7 @@
 ﻿using BookApi.Models;
 using BookApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookApi.Controllers
 {
@@ -35,7 +36,12 @@ namespace BookApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var delete = await _userService.DeleteAsync(id);
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(claim, out var currentUserId))
+                return Unauthorized();
+
+            var delete = await _userService.DeleteAsync(id, currentUserId);
 
             if(!delete)
                 return NotFound();

@@ -1,5 +1,6 @@
 ﻿using BookApi.Data;
 using BookApi.DTOs;
+using BookApi.Exceptions;
 using BookApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,8 +32,11 @@ namespace BookApi.Services
             return ToDto(user);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, int currentUserId)
         {
+            if (id == currentUserId)
+                throw new CannotDeleteYourselfException("You cannot delete yourself");
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             if(user == null)
