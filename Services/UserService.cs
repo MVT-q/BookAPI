@@ -48,6 +48,23 @@ namespace BookApi.Services
             return true;
         }
 
+        public async Task<bool> ChangeRoleAsync(int id, UserRole role)
+        {
+            if (!Enum.IsDefined(role))
+                throw new InvalidRoleException("Invalid user role");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return false;
+
+            user.Role = role;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         private static UserDto ToDto(User user)
         {
             return new UserDto

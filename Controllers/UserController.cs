@@ -1,4 +1,5 @@
-﻿using BookApi.Models;
+﻿using BookApi.DTOs;
+using BookApi.Models;
 using BookApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -44,6 +45,17 @@ namespace BookApi.Controllers
             var delete = await _userService.DeleteAsync(id, currentUserId);
 
             if(!delete)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/role")]
+        public async Task<IActionResult> ChangeRole(int id, ChangeRoleDto dto)
+        {
+            var user = await _userService.ChangeRoleAsync(id, dto.Role);
+
+            if(user == false)
                 return NotFound();
 
             return NoContent();

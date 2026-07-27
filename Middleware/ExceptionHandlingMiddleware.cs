@@ -27,6 +27,10 @@ namespace BookApi.Middleware
                 {
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 }
+                else if (ex is InvalidRoleException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
                 else
                 {
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
