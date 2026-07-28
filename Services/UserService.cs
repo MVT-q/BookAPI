@@ -57,8 +57,11 @@ namespace BookApi.Services
             return true;
         }
 
-        public async Task<bool> ChangeRoleAsync(int id, UserRole role)
+        public async Task<bool> ChangeRoleAsync(int id, UserRole role, int currentUserId)
         {
+            if (id == currentUserId)
+                throw new CannotChangeYourOwnRoleException("You cannot change your own role");
+
             if (!Enum.IsDefined(role))
                 throw new InvalidRoleException("Invalid user role");
 

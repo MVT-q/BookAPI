@@ -1,11 +1,13 @@
 ﻿using BookApi.DTOs;
 using BookApi.Models;
 using BookApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace BookApi.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -53,7 +55,12 @@ namespace BookApi.Controllers
         [HttpPatch("{id}/role")]
         public async Task<IActionResult> ChangeRole(int id, ChangeRoleDto dto)
         {
-            var user = await _userService.ChangeRoleAsync(id, dto.Role);
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(claim, out var currentUserId))
+                return Unauthorized();
+
+            var user = await _userService.ChangeRoleAsync(id, dto.Role, currentUserId);
 
             if(user == false)
                 return NotFound();

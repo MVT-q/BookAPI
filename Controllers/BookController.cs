@@ -18,12 +18,14 @@ namespace BookApi.Controllers
             _bookService = bookService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
             return Ok(await _bookService.GetBooksAsync());
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetById(int id)
         {
@@ -35,6 +37,7 @@ namespace BookApi.Controllers
             return Ok(book);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Book>> Create(CreateBookDto dto)
         {
@@ -46,6 +49,7 @@ namespace BookApi.Controllers
                 book);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<Book>> Update(int id, UpdateBookDto dto)
         {
@@ -57,6 +61,7 @@ namespace BookApi.Controllers
             return Ok(book);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

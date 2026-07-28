@@ -31,6 +31,10 @@ namespace BookApi.Middleware
                 {
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 }
+                else if (ex is CannotChangeYourOwnRoleException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
                 else
                 {
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
