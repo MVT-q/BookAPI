@@ -17,13 +17,13 @@ namespace BookApi.Services
 
         private readonly AppDbContext _context;
 
-        private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public AuthService(IConfiguration configuration, AppDbContext context)
+        public AuthService(IConfiguration configuration, AppDbContext context, IPasswordHasher<User> passwordHasher)
         {
             _configuration = configuration;
             _context = context;
-            _passwordHasher = new PasswordHasher<User>();
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<LoginResponseDto?> LoginAsync(LoginDto request)

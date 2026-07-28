@@ -1,16 +1,20 @@
 using BookApi.Data;
 using BookApi.Middleware;
+using BookApi.Models;
 using BookApi.Services;
+using BookApi.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BookApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,11 @@ namespace BookApi
             builder.Services.AddScoped<BookService>();
 
             builder.Services.AddScoped<UserService>();
+
+            builder.Services.Configure<AdminSettings>(
+                builder.Configuration.GetSection("Admin"));
+
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
@@ -93,6 +102,12 @@ namespace BookApi
             app.UseAuthorization();
 
             app.MapControllers();
+
+            using var scope = app.Services.CreateScope();
+
+            var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+
+            await userService.CreateAdminIfNotExistsAsync();
 
             app.Run();
         }

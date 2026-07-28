@@ -2,7 +2,10 @@
 using BookApi.DTOs;
 using BookApi.Exceptions;
 using BookApi.Models;
+using BookApi.Settings;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BookApi.Services
 {
@@ -10,9 +13,15 @@ namespace BookApi.Services
     {
         private readonly AppDbContext _context;
 
-        public UserService(AppDbContext context)
+        private readonly AdminSettings _adminSettings;
+
+        private readonly IPasswordHasher<User> _passwordHasher;
+
+        public UserService(AppDbContext context, IOptions<AdminSettings> adminSettings, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _adminSettings = adminSettings.Value;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<List<UserDto>> GetUsersAsync()
@@ -63,6 +72,28 @@ namespace BookApi.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task CreateAdminIfNotExistsAsync()
+        {
+            var adminExists = await _context.Users
+                .AnyAsync(u => u.Role == UserRole.Admin);
+
+            if (adminExists)
+                return;
+
+            var admin = new User
+            {
+                Username = _adminSettings.Username,
+                Email = _adminSettings.Email,
+                Role = UserRole.Admin
+            };
+
+            admin.PasswordHash = _passwordHasher.HashPassword(admin, _adminSettings.Password);
+
+            _context.Users.Add(admin);
+
+            await _context.SaveChangesAsync();
         }
 
         private static UserDto ToDto(User user)
