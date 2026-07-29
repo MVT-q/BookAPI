@@ -19,26 +19,18 @@ namespace BookApi.Middleware
             }
             catch (Exception ex)
             {
-                if(ex is UserAlreadyExistsException)
+                var statusCode = ex switch
                 {
-                    context.Response.StatusCode = StatusCodes.Status409Conflict;
-                }
-                else if(ex is CannotDeleteYourselfException)
-                {
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                }
-                else if (ex is InvalidRoleException)
-                {
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                }
-                else if (ex is CannotChangeYourOwnRoleException)
-                {
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                }
-                else
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                }
+                    UserAlreadyExistsException => StatusCodes.Status409Conflict,
+
+                    CannotDeleteYourselfException => StatusCodes.Status400BadRequest,
+                    InvalidRoleException => StatusCodes.Status400BadRequest,
+                    CannotChangeYourOwnRoleException => StatusCodes.Status400BadRequest,
+
+                    _ => StatusCodes.Status500InternalServerError
+                };
+
+                context.Response.StatusCode = statusCode;
 
                 context.Response.ContentType = "application/json";
 
