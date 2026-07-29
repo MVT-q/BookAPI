@@ -3,14 +3,13 @@ using BookApi.Models;
 using BookApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BookApi.Controllers
 {
     [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly UserService _userService;
 
@@ -20,13 +19,13 @@ namespace BookApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
             return Ok(await _userService.GetUsersAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetById(int id)
+        public async Task<ActionResult<UserDto>> GetById(int id)
         {
             var user = await _userService.GetByIdAsync(id);
 
@@ -39,12 +38,7 @@ namespace BookApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!int.TryParse(claim, out var currentUserId))
-                return Unauthorized();
-
-            var delete = await _userService.DeleteAsync(id, currentUserId);
+            var delete = await _userService.DeleteAsync(id, CurrentUserId);
 
             if(!delete)
                 return NotFound();
@@ -55,12 +49,7 @@ namespace BookApi.Controllers
         [HttpPatch("{id}/role")]
         public async Task<IActionResult> ChangeRole(int id, ChangeRoleDto dto)
         {
-            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!int.TryParse(claim, out var currentUserId))
-                return Unauthorized();
-
-            var user = await _userService.ChangeRoleAsync(id, dto.Role, currentUserId);
+            var user = await _userService.ChangeRoleAsync(id, dto.Role, CurrentUserId);
 
             if(user == false)
                 return NotFound();
