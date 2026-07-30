@@ -21,19 +21,19 @@ The project was created to learn the fundamentals of backend development.
 
 ## Endpoints
 
-POST /Auth/login
-POST /Auth/register
+- POST /Auth/login
+- POST /Auth/register
 
-GET /Book
-POST /Book
-GET /Book/{id}
-PUT /Book/{id}
-DELETE /Book/{id}
+- GET /Book
+- POST /Book
+- GET /Book/{id}
+- PUT /Book/{id}
+- DELETE /Book/{id}
 
-GET /User
-GET /User/{id}
-DELETE /User/{id}
-PATCH /User/{id}/role
+- GET /User
+- GET /User/{id}
+- DELETE /User/{id}
+- PATCH /User/{id}/role
 
 ## Test administrator account
 
